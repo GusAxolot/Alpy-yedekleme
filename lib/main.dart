@@ -229,7 +229,20 @@ exit 0
       final d = '$root/${b.id}', p = b.pkg;
       final r = await sh('''
 pm uninstall $p >/dev/null 2>&1
-out=\$(pm install-multiple -r -d -i com.android.vending ${q(d)}/apk/*.apk 2>&1)
+n=\$(ls ${q(d)}/apk/*.apk | wc -l)
+if [ "\$n" = "1" ]; then
+  out=\$(pm install -r -d -i com.android.vending ${q(d)}/apk/*.apk 2>&1)
+else
+  sid=\$(pm install-create -r -d -i com.android.vending 2>&1 | grep -o '[0-9][0-9]*' | head -n1)
+  [ -n "\$sid" ] || { echo "oturum acilamadi"; exit 8; }
+  i=0
+  for f in ${q(d)}/apk/*.apk; do
+    sz=\$(wc -c < "\$f")
+    pm install-write -S \$sz \$sid "\$i.apk" "\$f" >/dev/null 2>&1 || { echo "yazilamadi: \$f"; exit 9; }
+    i=\$((i+1))
+  done
+  out=\$(pm install-commit \$sid 2>&1)
+fi
 echo "\$out"
 case "\$out" in *Success*) ;; *) exit 5;; esac
 rm -rf /sdcard/Android/data/$p /sdcard/Android/obb/$p
@@ -478,29 +491,4 @@ exit 0
                     if (path == null) return;
                     final dir = await getApplicationDocumentsDirectory();
                     final f = await File(path).copy('${dir.path}/wall_${DateTime.now().millisecondsSinceEpoch}.jpg');
-                    customWalls.add(f.path);
-                    await sp!.setStringList('walls', customWalls);
-                    wall = 'f:${f.path}';
-                    await sp!.setString('wall', wall);
-                    setState(() {});
-                    setS(() {});
-                  },
-                  child: Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(border: Border.all(color: red), borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.add, color: red),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 8),
-              const Text('Galeriden eklediğin arka planı silmek için uzun bas.',
-                  style: TextStyle(fontSize: 12, color: Colors.white54)),
-              const SizedBox(height: 16),
-            ]),
-          ),
-        );
-      }),
-    );
-  }
-}
+                    custom
