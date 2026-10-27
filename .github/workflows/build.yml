@@ -33,6 +33,9 @@ jobs:
         working-directory: build_app
         run: |
           flutter pub get
+          PC="${PUB_CACHE:-$HOME/.pub-cache}"
+          find "$PC/hosted" -path '*/android/build.gradle' -exec sed -i -E 's/compileSdk(Version)?[ =]+[0-9]+/compileSdkVersion 36/' {} +
+          find "$PC/hosted" -path '*/android/build.gradle.kts' -exec sed -i -E 's/compileSdk(Version)?[ =]+[0-9]+/compileSdk = 36/' {} +
           dart run flutter_launcher_icons
           flutter build apk --release
       - uses: actions/upload-artifact@v4
