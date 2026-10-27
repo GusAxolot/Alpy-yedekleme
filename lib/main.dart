@@ -491,4 +491,20 @@ exit 0
                     if (path == null) return;
                     final dir = await getApplicationDocumentsDirectory();
                     final f = await File(path).copy('${dir.path}/wall_${DateTime.now().millisecondsSinceEpoch}.jpg');
-                    custom
+                    customWalls.add(f.path);
+                    await sp!.setStringList('walls', customWalls);
+                    wall = 'f:${f.path}';
+                    await sp!.setString('wall', wall);
+                    setState(() {});
+                    setS(() {});
+                  },
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(border: Border.all(color: red), borderRadius: BorderRadius.circular(8)),
+                    child: const Icon(Icons.add, color: red),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 8),
+        
