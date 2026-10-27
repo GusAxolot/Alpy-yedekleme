@@ -507,4 +507,14 @@ exit 0
                 ),
               ]),
               const SizedBox(height: 8),
+                            const Text('Galeriden eklediğin arka planı silmek için uzun bas.',
+                  style: TextStyle(fontSize: 12, color: Colors.white54)),
+              const SizedBox(height: 16),
+            ]),
+          ),
+        );
+      }),
+    );
+  }
+}
         
